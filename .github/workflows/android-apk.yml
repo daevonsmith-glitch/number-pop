@@ -24,7 +24,7 @@ jobs:
       # so any zip whose name starts with number-pop is accepted; the newest upload wins.
       - name: Unpack the uploaded game zip
         run: |
-                    Z=$(git log --diff-filter=AM --name-only --format= -- 'number-pop*.zip' | while read -r f; do if [ -f "$f" ]; then echo "$f"; break; fi; done)
+          Z=$(git log --diff-filter=AM --name-only --format= -- 'number-pop*.zip' | while read -r f; do if [ -f "$f" ]; then echo "$f"; break; fi; done)
           if [ -n "$Z" ]; then
             echo "Unpacking $Z"
             rm -rf /tmp/np && unzip -q -o "$Z" -d /tmp/np
