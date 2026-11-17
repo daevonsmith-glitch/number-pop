@@ -2,7 +2,7 @@
   "name": "number-pop",
   "version": "1.0.0",
   "private": true,
-  "description": "Number Pop - pop the bubble with the right answer",
+  "description": "Number Pop Kids - pop the bubble with the right answer",
   "dependencies": {
     "@capacitor-community/text-to-speech": "^8.0.0",
     "@capacitor/android": "^8.0.0",

@@ -1,5 +1,5 @@
 // Bump VERSION whenever index.html changes so installed phones get the update.
-const VERSION = "number-pop-v6";
+const VERSION = "number-pop-v7";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/maskable-192.png", "icons/maskable-512.png", "privacy.html"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

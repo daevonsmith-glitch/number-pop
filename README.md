@@ -1,4 +1,4 @@
-# Number Pop 🫧
+# Number Pop Kids 🫧
 
 Pop the bubble with the right answer. Addition, subtraction, multiplication and division, or mix them all. Made for kids and anyone who stims: no timer, no penalty for wrong taps, color-changing bubbles, counting pictures, and every problem and answer is spoken out loud ("3 plus 4 equals 7!"). Plays on phones and tablets: Android phones and tablets, iPhone and iPad.
 
@@ -87,7 +87,7 @@ jobs:
       # so any zip whose name starts with number-pop is accepted; the newest upload wins.
       - name: Unpack the uploaded game zip
         run: |
-          Z=$(git log --diff-filter=AM --name-only --format= -- 'number-pop*.zip' | while read -r f; do [ -f "$f" ] && echo "$f" && break; done)
+          Z=$(git log --diff-filter=AM --name-only --format= -- 'number-pop*.zip' | while read -r f; do if [ -f "$f" ]; then echo "$f"; break; fi; done)
           if [ -n "$Z" ]; then
             echo "Unpacking $Z"
             rm -rf /tmp/np && unzip -q -o "$Z" -d /tmp/np
@@ -243,7 +243,7 @@ jobs:
           P=ios/App/App/Info.plist
           # No encryption, so App Store Connect won't ask about export rules for each build.
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$P" || /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" "$P"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Number Pop" "$P" || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string Number Pop" "$P"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Number Pop Kids" "$P" || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string Number Pop Kids" "$P"
           # iPad: allow every orientation (Apple requires this for iPad multitasking).
           /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" "$P" || true
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$P"

@@ -1,12 +1,12 @@
-# Number Pop – step by step for Google Play and the App Store
+# Number Pop Kids – step by step for Google Play and the App Store
 
-How to build Number Pop for both stores and publish it under your own name (personal accounts). It works on phones and tablets: Android phones and tablets, iPhone and iPad.
+How to build Number Pop Kids for both stores and publish it under your own name (personal accounts). It works on phones and tablets: Android phones and tablets, iPhone and iPad.
 
 **What publishing as a person means:** no D-U-N-S number is needed, but your legal name is shown publicly as the seller on both stores, and Google makes every new game run a 14-day closed test with at least 12 testers before it can go public.
 
-**What's already done:** the game (phone and tablet layouts), the new logo, the Android build (APK + Play Store file), the iPhone/iPad build, Number Pop's Google signing key, the privacy policy page, the store text below, and every store graphic and screenshot.
+**What's already done:** the game (phone and tablet layouts), the new logo, the Android build (APK + Play Store file), the iPhone/iPad build, Number Pop Kids's Google signing key, the privacy policy page, the store text below, and every store graphic and screenshot.
 
-**Kids' game rules:** Number Pop is made for children, so Google's **Families** rules apply, and on Apple you can list it in the **Kids** category. The game already meets the main rules: no ads, no purchases, no accounts, no links out of the game, no tracking, and it doesn't load anything from other websites.
+**Kids' game rules:** Number Pop Kids is made for children, so Google's **Families** rules apply, and on Apple you can list it in the **Kids** category. The game already meets the main rules: no ads, no purchases, no accounts, no links out of the game, no tracking, and it doesn't load anything from other websites.
 
 ---
 
@@ -51,7 +51,7 @@ Every run gives the game a higher version number automatically, which Google req
 
 ### 1C. Create the app and listing
 
-1. In Play Console: **Create app** → name `Number Pop`, language English (United States), **Game**, **Free**. Tick the declarations and **Create app**.
+1. In Play Console: **Create app** → name `Number Pop Kids`, language English (United States), **Game**, **Free**. Tick the declarations and **Create app**.
 2. **Store settings → App category:** Game → **Educational**.
 3. **Main store listing:** paste the text from "Store text" below, then upload from the `google` folder in **number-pop-store-graphics.zip**:
 
@@ -83,7 +83,7 @@ Every run gives the game a higher version number automatically, which Google req
 2. **Testing → Closed testing → Create track** (or use "Closed testing - Alpha").
 3. **Testers:** create an email list with the 12+ Gmail addresses.
 4. **Create new release**, upload `NumberPop.aab`, accept **Play App Signing** when asked, write "First test", and roll it out.
-5. Copy the **opt-in link** from the Testers tab and send it to everyone. Each tester opens it, taps **Become a tester**, then installs Number Pop from Google Play.
+5. Copy the **opt-in link** from the Testers tab and send it to everyone. Each tester opens it, taps **Become a tester**, then installs Number Pop Kids from Google Play.
 6. All 12 must **stay opted in for 14 days in a row**. Ask them to play a few times. Recruit a couple of extras in case someone drops out.
 7. On day 14 or later: **Dashboard → Apply for production**, and answer Google's questions about the test (who tested, what feedback you got, what you changed).
 8. Google reviews the application, usually within about a week.
@@ -110,13 +110,13 @@ Every run gives the game a higher version number automatically, which Google req
 ### 2B. Register the game with Apple
 
 1. **developer.apple.com → Account → Certificates, IDs & Profiles → Identifiers → +**.
-2. **App IDs → App**. Description `Number Pop`. Choose **Explicit** and enter the app ID from Part 0 (for example `com.numberpop.game`). No extra capabilities. **Register**.
+2. **App IDs → App**. Description `Number Pop Kids`. Choose **Explicit** and enter the app ID from Part 0 (for example `com.numberpop.game`). No extra capabilities. **Register**.
 3. **App Store Connect → Apps → + → New App**:
    - Platform: iOS
-   - Name: `Number Pop` (if Apple says the name is taken, try `Number Pop: Math Bubbles`)
+   - Name: `Number Pop Kids` (if Apple says the name is taken, try `Number Pop Kids: Math Bubbles`)
    - Primary language: English (U.S.)
    - Bundle ID: the one you just registered
-   - SKU: `numberpop` (any private label)
+   - SKU: `numberpopkids` (any private label)
    - User access: Full access
 
 ### 2C. Connect GitHub to your Apple account
@@ -142,14 +142,14 @@ GitHub's Mac machines build and sign the iPhone/iPad app, so you don't need a Ma
 
 1. GitHub → **Actions → Build iPhone and iPad app → Run workflow**. It takes about 10 to 20 minutes.
 2. A green check means the game was sent to App Store Connect. Apple then processes it for another 15 to 30 minutes.
-3. App Store Connect → Number Pop → **TestFlight**. Under **Internal Testing**, create a group, add yourself, and select the build.
-4. Install the **TestFlight** app on your iPhone and/or iPad, open the invite, and install Number Pop. Play every mode, turn the iPad sideways, and check that problems and answers are read aloud.
+3. App Store Connect → Number Pop Kids → **TestFlight**. Under **Internal Testing**, create a group, add yourself, and select the build.
+4. Install the **TestFlight** app on your iPhone and/or iPad, open the invite, and install Number Pop Kids. Play every mode, turn the iPad sideways, and check that problems and answers are read aloud.
 
 Each run gives the build a higher number automatically.
 
 ### 2E. Store listing
 
-App Store Connect → Number Pop → the **1.0 Prepare for Submission** page:
+App Store Connect → Number Pop Kids → the **1.0 Prepare for Submission** page:
 
 1. **Screenshots** from the `apple` folder in **number-pop-store-graphics.zip**:
    - **iPhone 6.9" Display:** `iphone-1-menu.png` to `iphone-4-subtraction-correct.png`
@@ -159,7 +159,7 @@ App Store Connect → Number Pop → the **1.0 Prepare for Submission** page:
 4. **Build:** tap **+** and select the build that came through TestFlight.
 5. **App Review Information:** your name, phone and email. No sign-in is needed, so leave the demo account empty. In Notes write: *"Math game for children. No ads, purchases, accounts, links or data collection."*
 6. **Age Rating:** answer **None / No** to every content question. It should come out **4+**.
-7. **Kids category (your choice):** at the end of the age-rating questions, under **Age Categories and Override**, choose **Made for Kids** and the age band **6–8** (or **5 and Under**). This lists Number Pop in the App Store's Kids section. Once in, every future update must keep following the Kids rules (no ads, no tracking, no links out of the game without a parental gate). Number Pop already does. If you'd rather not, choose **Not Applicable**; the game is still rated 4+.
+7. **Kids category:** because the name has "Kids" in it, choose **Made for Kids** here. Apple reserves wording like "for kids" in a game's listing for games in the Kids category, so this avoids a rejection over the name. At the end of the age-rating questions, under **Age Categories and Override**, choose **Made for Kids** and the age band **6–8** (or **5 and Under**). This lists Number Pop Kids in the App Store's Kids section. Once in, every future update must keep following the Kids rules (no ads, no tracking, no links out of the game without a parental gate). Number Pop Kids already does. If you choose **Not Applicable** instead, the game is still rated 4+, but Apple's reviewer may ask you to take "Kids" out of the name.
 8. **App Privacy:** **Get Started** → "Do you or your third-party partners collect data from this app?" → **No** → **Publish**.
 9. **Pricing and Availability:** Free, choose countries.
 10. **App Information → Category:** primary **Education**, secondary **Games** (subcategory Educational or Family).
@@ -175,7 +175,7 @@ App Store Connect → Number Pop → the **1.0 Prepare for Submission** page:
 
 ### Google Play
 
-**App name:** `Number Pop`
+**App name:** `Number Pop Kids`
 
 **Short description** (80 max):
 
@@ -183,7 +183,7 @@ App Store Connect → Number Pop → the **1.0 Prepare for Submission** page:
 
 ### App Store
 
-**Name:** `Number Pop`
+**Name:** `Number Pop Kids`
 
 **Subtitle** (30 max): `Pop the right answer`
 
@@ -195,7 +195,7 @@ App Store Connect → Number Pop → the **1.0 Prepare for Submission** page:
 
 ### Full description (both stores)
 
-    Number Pop turns math practice into calm, colorful bubble popping. A problem appears at the top of the screen, bubbles drift up carrying numbers, and you pop the one with the right answer.
+    Number Pop Kids turns math practice into calm, colorful bubble popping. A problem appears at the top of the screen, bubbles drift up carrying numbers, and you pop the one with the right answer.
 
     FOUR KINDS OF MATH, PLUS A MIX
     • Addition
@@ -226,7 +226,7 @@ App Store Connect → Number Pop → the **1.0 Prepare for Submission** page:
 | File | For |
 |---|---|
 | `number-pop.zip` | The game, both build files, this guide |
-| `number-pop-play-store-signing-key.txt`, `number-pop-upload-keystore.jks` | Number Pop's Google signing key. Private: never in GitHub. |
+| `number-pop-play-store-signing-key.txt`, `number-pop-upload-keystore.jks` | Number Pop Kids's Google signing key. Private: never in GitHub. |
 | `number-pop-store-graphics.zip` | `google/`: Play icon, feature graphic, phone and tablet screenshots. `apple/`: iPhone (1290 × 2796) and iPad (2064 × 2752) screenshots. Kept out of the game zip so it stays small enough to upload to GitHub. |
 | `assets/icon-1024.png` | The App Store icon (the build adds it automatically) |
 | `AuthKey_XXXXXXXXXX.p8` | Apple API key you download in 2C. Private: never in GitHub. |

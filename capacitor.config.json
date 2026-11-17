@@ -1,6 +1,6 @@
 {
   "appId": "com.numberpop.game",
-  "appName": "Number Pop",
+  "appName": "Number Pop Kids",
   "webDir": "www",
   "android": { "backgroundColor": "#0f2a4a" },
   "ios": { "backgroundColor": "#0f2a4a", "contentInset": "never" }
