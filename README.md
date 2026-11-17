@@ -7,7 +7,8 @@ Pop the bubble with the right answer. Addition, subtraction, multiplication and 
 - `.github/workflows/android-apk.yml` – builds the Android APK and the Google Play file on GitHub
 - `.github/workflows/ios-build.yml` – builds the iPhone/iPad app on GitHub and sends it to App Store Connect
 - `package.json`, `capacitor.config.json` – settings the builds use
-- `assets/icon-1024.png` – the logo used for the app icons
+- `assets/icon-1024.png` – the logo used for the iPhone/iPad icon
+- `android-res/` – the Android app icon (the name in bubble colors)
 - `STORE-GUIDE.md` – step by step for Google Play and the App Store, with listing text
 
 ---
@@ -51,7 +52,7 @@ Tip: if numbers aren't read aloud on iPhone, check that the silent switch is off
 ---
 
 ## Updating the game
-Edit `www/index.html`. Also change `VERSION` in `www/sw.js` (for example to `number-pop-v5`) so installed phones pick up the change.
+Edit `www/index.html`. Also change `VERSION` in `www/sw.js` (for example to `number-pop-v6`) so installed phones pick up the change.
 
 ---
 
@@ -78,21 +79,30 @@ jobs:
       KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Lets you upload the whole game as one zip from a phone: this unpacks it into the repository.
-      - name: Unpack number-pop.zip
+      # Phones often rename repeat downloads (number-pop2.zip, number-pop (1).zip),
+      # so any zip whose name starts with number-pop is accepted; the newest upload wins.
+      - name: Unpack the uploaded game zip
         run: |
-          if [ -f number-pop.zip ]; then
-            unzip -q -o number-pop.zip -d /tmp/np
+          Z=$(git log --diff-filter=AM --name-only --format= -- 'number-pop*.zip' | while read -r f; do [ -f "$f" ] && echo "$f" && break; done)
+          if [ -n "$Z" ]; then
+            echo "Unpacking $Z"
+            rm -rf /tmp/np && unzip -q -o "$Z" -d /tmp/np
             rm -rf /tmp/np/number-pop/.github
             cp -r /tmp/np/number-pop/. .
-            git rm -q number-pop.zip
+            git rm -q -- number-pop*.zip
             git add -A
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -q -m "Unpack game files from number-pop.zip"
+            git commit -q -m "Unpack game files from $Z"
             git push
+          else
+            echo "No game zip to unpack"
           fi
+          grep -c "voiceInfo" www/index.html && echo "Game version: has the voice fix" || echo "::warning::Game version is OLD (no voice fix) - upload the newest number-pop.zip"
 
       - uses: actions/setup-node@v4
         with:
@@ -123,19 +133,19 @@ jobs:
           G=android/app/build.gradle
           sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]*\"/versionName \"1.0.${{ github.run_number }}\"/" "$G"
           grep -E "versionCode|versionName" "$G"
+          grep -E "Sdk" android/variables.gradle
 
+      # The Number Pop logo (the name in bubble colors), made ahead of time in the android-res folder.
       - name: Add app icon
-        continue-on-error: true
         run: |
           R=android/app/src/main/res
-          for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
-            n=${d%%:*}; s=${d##*:}
-            mkdir -p $R/mipmap-$n
-            convert assets/icon-1024.png -resize ${s}x${s} $R/mipmap-$n/ic_launcher.png
-            cp $R/mipmap-$n/ic_launcher.png $R/mipmap-$n/ic_launcher_round.png
-            rm -f $R/mipmap-$n/ic_launcher_foreground.png
-          done
-          rm -rf $R/mipmap-anydpi-v26
+          if [ -d android-res ]; then
+            rm -f $R/mipmap-*/ic_launcher*.png $R/mipmap-*/ic_launcher*.webp
+            cp -r android-res/. $R/
+            echo "Number Pop icon added:"; ls $R/mipmap-anydpi-v26 $R/mipmap-xxxhdpi
+          else
+            echo "::warning::The android-res folder is missing, so the app has the default icon. Upload the newest number-pop.zip."
+          fi
 
       - name: Build APK (for sharing directly)
         working-directory: android
