@@ -1,0 +1,7 @@
+{
+  "appId": "com.numberpop.game",
+  "appName": "Number Pop",
+  "webDir": "www",
+  "android": { "backgroundColor": "#0f2a4a" },
+  "ios": { "backgroundColor": "#0f2a4a", "contentInset": "never" }
+}

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Number Pop</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Number Pop">
+<meta name="theme-color" content="#0f2a4a">
+<style>
+  :root { --bg1:#0f2a4a; --bg2:#1d5a7a; --ink:#fff; --soft:rgba(255,255,255,.72); }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  html,body { margin:0; height:100%; overflow:hidden; font-family:ui-rounded,'SF Pro Rounded','Arial Rounded MT Bold','Nunito','Varela Round',system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(circle at 30% 20%, var(--bg2), var(--bg1) 70%); touch-action:manipulation; }
+  #app { position:fixed; inset:0; display:flex; flex-direction:column;
+    padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 10px); }
+  header { display:flex; align-items:center; justify-content:space-between; gap:8px; z-index:5; }
+  .pill { background:rgba(255,255,255,.12); border-radius:999px; padding:6px 14px; font-weight:800; font-size:18px; white-space:nowrap; }
+  button.icon { background:rgba(255,255,255,.14); border:0; color:#fff; border-radius:999px; width:44px; height:44px; font-size:22px; cursor:pointer; flex:none; }
+  #target { z-index:5; text-align:center; margin-top:8px; }
+  #problem { display:flex; justify-content:center; align-items:center; gap:10px; font-size:46px; font-weight:800; line-height:1; }
+  #problem .op { color:#ffd43b; }
+  #answer { min-width:70px; height:66px; padding:0 10px; border-radius:18px; background:rgba(255,255,255,.1); border:3px dashed #fff;
+    display:flex; align-items:center; justify-content:center; animation:pulse 1.2s infinite; transition:background .3s; }
+  #answer.filled { border-style:solid; border-color:transparent; animation:none; transform:scale(1.1); }
+  @keyframes pulse { 50% { transform:scale(1.07); } }
+  #hint { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; margin:8px auto 0; max-width:560px; min-height:10px; }
+  #hint .grp { display:flex; flex-wrap:wrap; justify-content:center; gap:2px; padding:4px 6px; border-radius:12px; background:rgba(255,255,255,.08); }
+  #hint .row { display:flex; gap:2px; justify-content:center; }
+  #hint .col { display:flex; flex-direction:column; gap:2px; padding:4px 6px; border-radius:12px; background:rgba(255,255,255,.08); }
+  #hint .sym { font-weight:800; font-size:26px; color:#ffd43b; padding:0 2px; }
+  #hint .gone { opacity:.25; filter:grayscale(1); position:relative; }
+  #hint .gone::after { content:''; position:absolute; left:-2px; right:-2px; top:50%; height:3px; background:#ff8787; transform:rotate(-30deg); border-radius:2px; }
+  #hint span.it { display:inline-block; line-height:1; }
+  #field { position:relative; flex:1; overflow:hidden; margin-top:6px; }
+  .bubble { position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-weight:800; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,.35); cursor:pointer; will-change:transform;
+    box-shadow: inset -8px -10px 18px rgba(0,0,0,.18), inset 8px 10px 18px rgba(255,255,255,.45), 0 6px 18px rgba(0,0,0,.25);
+    transition: background-color 1.2s linear; }
+  .bubble::after { content:''; position:absolute; top:14%; left:20%; width:26%; height:18%; border-radius:50%; background:rgba(255,255,255,.7); transform:rotate(-30deg); }
+  .bubble.wobble { animation:wobble .4s; }
+  @keyframes wobble { 25%{ filter:brightness(.8);} 50%{ filter:brightness(1.2);} }
+  .spark { position:absolute; width:10px; height:10px; border-radius:50%; pointer-events:none; }
+  #overlay { position:fixed; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background:rgba(5,15,35,.75); backdrop-filter:blur(4px); overflow:auto; padding:16px 0; }
+  #overlay.hide { display:none; }
+  .card { background:linear-gradient(160deg,#2b8ac2,#163f78); border-radius:28px; padding:24px 22px; width:min(92vw,400px); text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4); margin:auto; }
+  .card h1 { margin:0; font-size:44px; line-height:1; }
+  .logo { letter-spacing:-.5px; -webkit-text-stroke:0; text-shadow:0 0 1px #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0 5px 8px rgba(0,0,0,.35); }
+  .card p { color:var(--soft); margin:6px 0 12px; font-size:18px; }
+  .modes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .big { font-family:inherit; display:block; width:100%; border:0; border-radius:18px; padding:12px 8px; margin:0; font:inherit; font-size:20px; font-weight:800; color:#123; cursor:pointer; }
+  .big .sy { display:block; font-size:30px; line-height:1.1; }
+  .wide { grid-column:1 / -1; }
+  .opt { display:flex; justify-content:space-between; align-items:center; margin:10px 2px; font-size:18px; text-align:left; }
+  .toggle { width:56px; height:32px; border-radius:999px; background:rgba(255,255,255,.25); position:relative; border:0; cursor:pointer; flex:none; }
+  .toggle::after { content:''; position:absolute; top:4px; left:4px; width:24px; height:24px; border-radius:50%; background:#fff; transition:left .2s; }
+  .toggle.on { background:#4ade80; } .toggle.on::after { left:28px; }
+  .seg { display:flex; background:rgba(0,0,0,.2); border-radius:999px; padding:4px; margin:14px 0 4px; }
+  .seg button { white-space:nowrap; flex:1; border:0; background:transparent; color:#fff; font:inherit; font-size:17px; font-weight:800; padding:8px; border-radius:999px; cursor:pointer; }
+  .seg button.on { background:#fff; color:#163f78; }
+  #cheer { position:fixed; left:0; right:0; top:40%; text-align:center; font-size:50px; font-weight:800; z-index:10; pointer-events:none; opacity:0; transform:scale(.5); transition:all .35s cubic-bezier(.2,1.6,.4,1); text-shadow:0 4px 20px rgba(0,0,0,.4); padding:0 10px; }
+  #cheer.show { opacity:1; transform:scale(1); }
+  @media (max-width:380px) { .seg button { font-size:15px; } }
+  /* iPads and tablets: everything scales up */
+  @media (min-width:700px) and (min-height:600px) {
+    #app { padding-left:24px; padding-right:24px; }
+    .pill { font-size:24px; padding:8px 20px; }
+    button.icon { width:58px; height:58px; font-size:28px; }
+    #problem { font-size:72px; gap:16px; }
+    #answer { min-width:110px; height:100px; border-radius:24px; }
+    #hint { max-width:86vw; gap:10px; }
+    #hint .sym { font-size:40px; }
+    .card { width:min(86vw,560px); padding:34px 32px; border-radius:36px; }
+    .card h1 { font-size:62px; }
+    .card p { font-size:24px; }
+    .big { font-size:26px; padding:18px 10px; border-radius:22px; }
+    .big .sy { font-size:40px; }
+    .opt { font-size:23px; margin:14px 2px; }
+    .toggle { width:68px; height:38px; } .toggle::after { width:30px; height:30px; } .toggle.on::after { left:34px; }
+    .seg button { font-size:22px; padding:12px; }
+    #cheer { font-size:76px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <button class="icon" id="menuBtn" aria-label="Menu">☰</button>
+    <div class="pill" id="modePill">Addition</div>
+    <div class="pill">⭐ <span id="stars">0</span></div>
+    <button class="icon" id="sayBtn" aria-label="Say the problem">🔊</button>
+  </header>
+  <div id="target">
+    <div id="problem"><span id="pA">3</span><span class="op" id="pOp">+</span><span id="pB">4</span><span>=</span><div id="answer">?</div></div>
+    <div id="hint"></div>
+  </div>
+  <div id="field"></div>
+</div>
+<div id="cheer"></div>
+
+<div id="overlay">
+  <div class="card">
+    <h1 class="logo"><span style="color:#ff6b9d">N</span><span style="color:#ffa94d">u</span><span style="color:#ffd43b">m</span><span style="color:#69db7c">b</span><span style="color:#4dabf7">e</span><span style="color:#9775fa">r</span> <span style="color:#4dabf7">P</span><span style="color:#9775fa">o</span><span style="color:#f783ac">p</span></h1>
+    <p>Pop the bubble with the right answer!</p>
+    <div class="modes">
+      <button class="big" style="background:#a7f3d0" data-op="add"><span class="sy">➕</span>Addition</button>
+      <button class="big" style="background:#fde68a" data-op="sub"><span class="sy">➖</span>Subtraction</button>
+      <button class="big" style="background:#fbcfe8" data-op="mul"><span class="sy">✖️</span>Multiplication</button>
+      <button class="big" style="background:#c7d2fe" data-op="div"><span class="sy">➗</span>Division</button>
+      <button class="big wide" style="background:#fed7aa" data-op="mix"><span class="sy" style="display:inline;font-size:24px">🎲 </span>Mix them all</button>
+    </div>
+    <div class="seg" id="sizeSeg">
+      <button class="on" data-size="0">Small numbers</button>
+      <button data-size="1">Big numbers</button>
+    </div>
+    <div class="opt"><span>Show counting pictures</span><button class="toggle on" id="tHint"></button></div>
+    <div class="opt"><span>Sounds</span><button class="toggle on" id="tSound"></button></div>
+    <div class="opt"><span>Calm mode (slow bubbles)</span><button class="toggle" id="tCalm"></button></div>
+    <button class="big" id="countBtn" style="background:#bae6fd;font-size:18px;margin-top:6px">🔢 Count to 100</button>
+  </div>
+</div>
+
+<script>
+/* Small numbers: + and − up to 10, × and ÷ up to 5.  Big numbers: + and − up to 20, × and ÷ up to 10. */
+const OPS = {
+  add:{ sym:"+", word:"plus",       name:"Addition" },
+  sub:{ sym:"−", word:"minus",      name:"Subtraction" },
+  mul:{ sym:"×", word:"times",      name:"Multiplication" },
+  div:{ sym:"÷", word:"divided by", name:"Division" }
+};
+const ITEMS = ["🍎","🍓","⭐","🐟","🍪","🎈","🐞","🌸","🍊","🐥","🚗","🧁"];
+const COLORS = ["#ff6b9d","#ffa94d","#ffd43b","#69db7c","#4dabf7","#9775fa","#f783ac","#38d9a9","#ff8787","#74c0fc"];
+
+let mode = "add", size = 0, prob = null, solved = false, stars = 0, bubbles = [], running = false, last = 0, spawnT = 0;
+let opt = { hint:true, sound:true, calm:false };
+const $ = id => document.getElementById(id);
+const field = $("field");
+const R = (lo,hi) => lo + Math.floor(Math.random()*(hi-lo+1));
+try { stars = +localStorage.getItem("np_stars") || 0; } catch(e){}
+$("stars").textContent = stars;
+
+/* ---------- sound ---------- */
+let ac;
+function audio(){ if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac && ac.state==="suspended") ac.resume(); return ac; }
+function tone(freq, dur=.12, type="sine", vol=.25, slide=0){
+  if(!opt.sound) return; const a = audio(); if(!a) return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime;
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(freq*slide, t+dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t+dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur);
+}
+const popSound = () => tone(700, .15, "sine", .3, 1.8);
+const softBoop = () => tone(220, .12, "triangle", .12, .8);
+const winSound = () => [523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,.25,"triangle",.25),i*110));
+
+/* ---------- speech: same engine as Word Pop — works on iPhone, Android browser, and the Android app ----------
+   Android app (APK): uses the phone's own text-to-speech through the Capacitor TextToSpeech plugin.
+   iPhone Safari / Android Chrome / desktop: web speechSynthesis, with fixes for Chrome-on-Android quirks. */
+const Speech = (() => {
+  const cap = window.Capacitor;
+  let nativeTTS = null;
+  try {
+    if (cap && cap.isNativePlatform && cap.isNativePlatform() && cap.registerPlugin) nativeTTS = cap.registerPlugin("TextToSpeech");
+  } catch(e) {}
+  const web = !nativeTTS && "speechSynthesis" in window ? window.speechSynthesis : null;
+
+  let voice = null;
+  function pickVoice(){
+    if(!web) return;
+    const vs = web.getVoices() || [];
+    voice = vs.find(v=>/^en[-_]US$/i.test(v.lang) && v.localService) || vs.find(v=>/^en[-_]US$/i.test(v.lang))
+         || vs.find(v=>/^en/i.test(v.lang)) || null;
+  }
+  if(web){ pickVoice(); try{ web.addEventListener ? web.addEventListener("voiceschanged", pickVoice) : (web.onvoiceschanged = pickVoice); }catch(e){} }
+
+  let queue = [], busy = false, gen = 0;
+  const keep = [];
+
+  function sayOnce(text, o){
+    if(nativeTTS){
+      return nativeTTS.speak({ text, lang:"en-US", rate:o.rate, pitch:o.pitch, volume:1.0, category:"playback" }).catch(()=>{});
+    }
+    if(!web) return Promise.resolve();
+    return new Promise(res => {
+      let done = false; const fin = () => { if(!done){ done = true; clearTimeout(t); const i = keep.indexOf(u); if(i>=0) keep.splice(i,1); res(); } };
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-US"; if(voice) u.voice = voice;
+      u.rate = o.rate; u.pitch = o.pitch; u.volume = 1;
+      u.onend = fin; u.onerror = fin; keep.push(u);
+      const t = setTimeout(fin, 900 + text.length * 260 / o.rate);
+      if(web.paused) web.resume();
+      web.speak(u);
+    });
+  }
+  function pump(){
+    if(busy || !queue.length) return;
+    busy = true;
+    const my = gen, item = queue.shift();
+    sayOnce(item.text, item).then(() => { if(my === gen){ busy = false; pump(); } });
+  }
+  function stop(){
+    gen++; queue = []; busy = false;
+    try{ if(nativeTTS) nativeTTS.stop().catch(()=>{}); else if(web) web.cancel(); }catch(e){}
+  }
+  return {
+    say(text, {rate=.85, pitch=1.2, interrupt=true}={}){
+      if(!opt.sound) return;
+      const wasBusy = busy;
+      if(interrupt) stop();
+      queue.push({text, rate, pitch});
+      if(interrupt && wasBusy && web) setTimeout(pump, 80); else pump();
+    },
+    unlock(){
+      try{
+        if(web && !this._u){ this._u = true; const u = new SpeechSynthesisUtterance(" "); u.volume = 0; web.speak(u); }
+        if(web) pickVoice();
+      }catch(e){}
+    },
+    stop
+  };
+})();
+const problemWords = p => `${p.a} ${OPS[p.op].word} ${p.b}`;
+function sayProblem(){ if(prob) Speech.say(problemWords(prob) + " equals?", {rate:.8}); }
+function sayAnswer(){ Speech.say(`${problemWords(prob)} equals ${prob.ans}!`, {rate:.8, pitch:1.25}); }
+function sayCount(){ Speech.stop(); for(let i=1;i<=100;i++) Speech.say(String(i), {rate:.9, pitch:1.3, interrupt:false}); }
+function buzz(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
+
+/* ---------- problems ---------- */
+function makeProblem(op){
+  const max = size ? 20 : 10, tmax = size ? 10 : 5;
+  let a, b, ans;
+  if(op === "add"){ a = R(size?1:0, max-1); b = R(size?1:0, max-a); if(a+b===0) b=1; ans = a+b; }
+  else if(op === "sub"){ a = R(2, max); b = R(1, a); ans = a-b; }
+  else if(op === "mul"){ a = R(1, tmax); b = R(1, tmax); ans = a*b; }
+  else { b = R(1, tmax); ans = R(1, tmax); a = b*ans; }
+  return { op, a, b, ans, item: ITEMS[R(0, ITEMS.length-1)] };
+}
+
+function newProblem(){
+  const op = mode === "mix" ? ["add","sub","mul","div"][R(0,3)] : mode;
+  let p; do { p = makeProblem(op); } while(prob && p.a===prob.a && p.b===prob.b && p.op===prob.op);
+  prob = p; solved = false;
+  $("modePill").textContent = mode === "mix" ? "🎲 " + OPS[op].name : OPS[op].name;
+  $("pA").textContent = p.a; $("pOp").textContent = OPS[op].sym; $("pB").textContent = p.b;
+  const ans = $("answer"); ans.textContent = "?"; ans.classList.remove("filled"); ans.style.background = "";
+  drawHint();
+  bubbles.forEach(b=>b.el.remove()); bubbles = [];
+  const n0 = innerWidth > 700 ? 7 : 5;
+  for(let i=0;i<n0;i++) spawn(true, i, n0);
+  setTimeout(sayProblem, 300);
+}
+
+/* counting pictures */
+function drawHint(){
+  const h = $("hint"); h.innerHTML = "";
+  if(!opt.hint) return;
+  const p = prob, it = p.item;
+  const total = p.op==="add" ? p.a+p.b : p.op==="sub" ? p.a : p.op==="mul" ? p.a*p.b : p.a;
+  const k = Math.max(1, Math.min(1.9, Math.min(innerWidth, innerHeight) / 420));   // bigger on tablets
+  const fs = Math.round(k * (total <= 10 ? 28 : total <= 20 ? 22 : total <= 40 ? 16 : total <= 64 ? 13 : 11));
+  const mk = (cls="") => { const s = document.createElement("span"); s.className = "it " + cls; s.textContent = it; s.style.fontSize = fs+"px"; return s; };
+  const grp = n => { const g = document.createElement("div"); g.className = "grp"; for(let i=0;i<n;i++) g.appendChild(mk()); return g; };
+  const sym = t => { const s = document.createElement("span"); s.className = "sym"; s.textContent = t; return s; };
+  if(p.op === "add"){
+    if(p.a) h.appendChild(grp(p.a));
+    h.appendChild(sym("+"));
+    if(p.b) h.appendChild(grp(p.b));
+  } else if(p.op === "sub"){
+    // all of them, with the ones taken away crossed out
+    const g = document.createElement("div"); g.className = "grp";
+    for(let i=0;i<p.a;i++) g.appendChild(mk(i >= p.a - p.b ? "gone" : ""));
+    h.appendChild(g);
+  } else if(p.op === "mul"){
+    // a rows of b
+    const c = document.createElement("div"); c.className = "col";
+    for(let r=0;r<p.a;r++){ const row = document.createElement("div"); row.className = "row"; for(let i=0;i<p.b;i++) row.appendChild(mk()); c.appendChild(row); }
+    h.appendChild(c);
+  } else {
+    // a things shared into b equal groups — count one group
+    for(let g=0; g<p.b; g++) h.appendChild(grp(p.ans));
+  }
+}
+
+function pickNumber(){
+  const ans = prob.ans;
+  const onScreen = bubbles.some(b=>b.n===ans);
+  if(!onScreen || Math.random() < .3) return ans;
+  const top = Math.max(10, prob.op==="mul" ? (size?100:25) : size?20:10);
+  let n;
+  do {
+    const r = Math.random();
+    n = r < .5 ? ans + [-2,-1,1,2][R(0,3)]
+      : r < .65 && (prob.op==="mul") ? ans + [-prob.b, prob.b, -prob.a, prob.a][R(0,3)]   // neighbor in the times table
+      : r < .75 ? ans + [-10,10][R(0,1)]
+      : R(0, top);
+  } while(n < 0 || n === ans);
+  return n;
+}
+
+function spawn(initial, slot, of){
+  const W = field.clientWidth, H = field.clientHeight;
+  // phones ~66–96px, tablets up to 150px
+  const sz = Math.max(66, Math.min(W/4.6, H/4, 150));
+  const n = pickNumber();
+  const el = document.createElement("div"); el.className = "bubble";
+  el.style.width = el.style.height = sz+"px";
+  const len = String(n).length;
+  el.style.fontSize = (sz * (len===1 ? .5 : len===2 ? .42 : .34))+"px";
+  el.textContent = n;
+  const ci = R(0, COLORS.length-1);
+  el.style.backgroundColor = COLORS[ci];
+  const b = { el, n, size:sz, ci,
+    // first bubbles of a round are spread out in columns so they don't pile up
+    x: initial && of ? ((slot + .15 + Math.random()*.7) / of) * (W-sz) : Math.random()*(W-sz),
+    y: initial ? H*0.25 + ((slot*0.37 + Math.random()*0.3) % 1) * H*0.7 : H + 10,
+    vy: ((opt.calm? 22 : 38) + Math.random()*(opt.calm?12:30) + size*6) * Math.max(1, Math.min(1.6, H/650)),
+    ph: Math.random()*6.28, sway: 10+Math.random()*16, bx:0, colorT: Math.random()*1.5 };
+  b.bx = b.x;
+  el.addEventListener("pointerdown", e=>{ e.preventDefault(); tap(b); });
+  field.appendChild(el); bubbles.push(b);
+}
+
+function tap(b){
+  audio();
+  if(solved) return;
+  if(b.n === prob.ans){
+    solved = true;
+    popAt(b);
+    const ans = $("answer"); ans.textContent = b.n; ans.style.background = COLORS[b.ci]; ans.classList.add("filled");
+    popSound(); buzz(15);
+    sayAnswer();
+    win();
+  } else {
+    // gentle: no penalty, just a soft wobble
+    b.el.classList.remove("wobble"); void b.el.offsetWidth; b.el.classList.add("wobble");
+    softBoop();
+  }
+}
+
+function popAt(b){
+  const cx = b.x + b.size/2, cy = b.y + b.size/2;
+  for(let i=0;i<10;i++){
+    const s = document.createElement("div"); s.className = "spark";
+    s.style.background = COLORS[(b.ci+i)%COLORS.length];
+    s.style.left = cx+"px"; s.style.top = cy+"px"; field.appendChild(s);
+    const a = i/10*6.28, d = 40+Math.random()*40;
+    s.animate([{transform:"translate(-50%,-50%) scale(1)",opacity:1},{transform:`translate(${Math.cos(a)*d-5}px,${Math.sin(a)*d-5}px) scale(.2)`,opacity:0}],{duration:500,easing:"ease-out"}).onfinish=()=>s.remove();
+  }
+  b.el.animate([{transform:b.el.style.transform+" scale(1)",opacity:1},{transform:b.el.style.transform+" scale(1.5)",opacity:0}],{duration:180}).onfinish=()=>b.el.remove();
+  bubbles = bubbles.filter(x=>x!==b);
+}
+
+function win(){
+  stars++; $("stars").textContent = stars; try{ localStorage.setItem("np_stars", stars); }catch(e){}
+  winSound(); buzz([20,40,20]);
+  const c = $("cheer"); c.textContent = ["Great job!","You got it!","Awesome!","Super!","Yay!"][R(0,4)] + " " + prob.item;
+  c.classList.add("show");
+  bubbles.slice().forEach((b,i)=>setTimeout(()=>{ if(bubbles.includes(b)){ popAt(b); tone(600+i*60,.1,"sine",.12,1.5);} }, i*90));
+  // longer pause than Word Pop so the whole sentence ("7 plus 5 equals 12") is heard
+  setTimeout(()=>{ c.classList.remove("show"); if(running) newProblem(); }, 3600);
+}
+
+/* ---------- loop ---------- */
+function loop(t){
+  const dt = Math.min(.05, (t-last)/1000 || 0); last = t;
+  if(running && prob && !solved){
+    const W = field.clientWidth;
+    spawnT -= dt;
+    const maxB = 6 + size + (W > 700 ? 3 : 0);
+    if(spawnT<=0 && bubbles.length < maxB){ spawn(); spawnT = (opt.calm?1.8:1.1) + Math.random()*.6; }
+    for(const b of bubbles.slice()){
+      b.y -= b.vy*dt; b.ph += dt*1.4;
+      if(b.bx > W-b.size) b.bx = Math.max(0, W-b.size);
+      b.x = Math.max(0, Math.min(W-b.size, b.bx + Math.sin(b.ph)*b.sway));
+      b.colorT -= dt;
+      if(b.colorT<=0){ b.ci = (b.ci+1)%COLORS.length; b.el.style.backgroundColor = COLORS[b.ci]; b.colorT = 1.5+Math.random(); }
+      b.el.style.transform = `translate(${b.x}px,${b.y}px)`;
+      if(b.y < -b.size-10){ b.el.remove(); bubbles = bubbles.filter(x=>x!==b); }
+    }
+    if(!bubbles.some(b=>b.n===prob.ans)) spawn();
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+addEventListener("resize", ()=>{ if(prob && opt.hint) drawHint(); });
+
+/* ---------- menu ---------- */
+document.querySelectorAll("[data-op]").forEach(btn=>btn.addEventListener("click",()=>{
+  audio(); Speech.unlock(); mode = btn.dataset.op; $("overlay").classList.add("hide"); running = true; prob = null; newProblem();
+}));
+document.querySelectorAll("[data-size]").forEach(btn=>btn.addEventListener("click",()=>{
+  size = +btn.dataset.size;
+  document.querySelectorAll("[data-size]").forEach(x=>x.classList.toggle("on", x===btn));
+}));
+$("menuBtn").onclick = ()=>{ Speech.stop(); running = false; $("overlay").classList.remove("hide"); };
+$("sayBtn").onclick = ()=>{ audio(); Speech.unlock(); sayProblem(); };
+$("countBtn").onclick = ()=>{ audio(); Speech.unlock(); sayCount(); };
+[["tHint","hint"],["tSound","sound"],["tCalm","calm"]].forEach(([id,k])=>{
+  $(id).onclick = ()=>{ opt[k] = !opt[k]; $(id).classList.toggle("on", opt[k]); if(k==="hint" && prob) drawHint(); };
+});
+
+/* offline support when installed from the web */
+if ("serviceWorker" in navigator && location.protocol === "https:" && location.hostname !== "localhost") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
